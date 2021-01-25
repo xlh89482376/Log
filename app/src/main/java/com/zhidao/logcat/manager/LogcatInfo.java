@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final class LogcatInfo {
+public final class LogcatInfo {
 
     private static final String LINE_SPACE = "\n    ";
 
@@ -50,7 +50,7 @@ final class LogcatInfo {
         return time;
     }
 
-    String getLevel() {
+    public String getLevel() {
         return level;
     }
 
@@ -72,6 +72,6 @@ final class LogcatInfo {
 
     @Override
     public String toString() {
-        return String.format("%s   %s   %s", time, tag, log);
+        return String.format("%s   %s    %s   %s", time, pid, tag, log);
     }
 }

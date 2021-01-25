@@ -27,6 +27,9 @@ final class LogcatConfig {
         }
     }
 
+    /**
+     * 设置log级别
+     */
     static void setLogcatLevel(String level) {
         if (sConfig != null) {
             sConfig.edit().putString(LOGCAT_LEVEL, level).apply();
@@ -46,6 +49,10 @@ final class LogcatConfig {
         }
     }
 
+    /**
+     * 设置搜索关键字
+     * @param keyword
+     */
     static void setLogcatText(String keyword) {
         if (sConfig != null) {
             sConfig.edit().putString(LOGCAT_TEXT, keyword).apply();

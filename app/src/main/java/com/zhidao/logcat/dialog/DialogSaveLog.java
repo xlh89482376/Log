@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.ui.dialog;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.zhidao.logcat.R;
 
 public class DialogSaveLog extends Dialog {
 
@@ -28,8 +30,7 @@ public class DialogSaveLog extends Dialog {
 
     public DialogSaveLog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // instantiate the dialog with the custom Theme
         assert inflater != null;
         @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.logcat_save_log, null);
@@ -54,9 +55,10 @@ public class DialogSaveLog extends Dialog {
 
                 if (logName.isEmpty()) {
                     // 使用默认值
-                    logName = etSaveLog.getHint().toString();
+//                    logName = etSaveLog.getHint().toString();
+//                    toast("请输入log名称");
+                    Toast.makeText(context,"请输入log名称", Toast.LENGTH_LONG).show();
                 }
-
                 if (mOnCommitListener != null) {
                     mOnCommitListener.onCommit(logName);
                 }
@@ -65,7 +67,6 @@ public class DialogSaveLog extends Dialog {
             }
         });
     }
-
     public void setOnCommitListener(OnCommitListener onCommitListener) {
         this.mOnCommitListener = onCommitListener;
     }

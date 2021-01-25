@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.zhidao.logcat.manager.LogcatConfig;
+
 public final class InitProvider extends ContentProvider {
 
     @Override

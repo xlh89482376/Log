@@ -1,5 +1,6 @@
 package com.zhidao.logcat;
 
+import android.nfc.Tag;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -81,13 +82,7 @@ final class LogcatManager {
             BufferedReader reader = null;
             try {
                 Process process = new ProcessBuilder("logcat", "-v", "threadtime").start();
-//                Process process = new ProcessBuilder()
-//                        .command("logcat", "-v")
-//                        .redirectErrorStream(true)
-//                        .start();
                 reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-
 
                 String line;
 

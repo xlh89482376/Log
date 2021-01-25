@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.hjq.xtoast.OnClickListener;
 import com.hjq.xtoast.XToast;
+import com.zhidao.logcat.adapter.ChooseAdapter;
 
 import java.util.Arrays;
 import java.util.List;
