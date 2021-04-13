@@ -1,10 +1,12 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.zhidao.logcat.R;
 
 import java.util.List;
 
@@ -41,7 +43,7 @@ public final class ChooseAdapter extends BaseAdapter {
         return convertView;
     }
 
-    void setData(List<String> data) {
+    public void setData(List<String> data) {
         mDataSet = data;
     }
 

@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="30dp">
+    android:background="@color/logcat_window_background_color"
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_marginTop="10dp">
 
         <TextView
             android:id="@+id/tvSaveLog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Log文件名"
-            android:textColor="@color/black"
-            android:textSize="30sp" />
+            android:text="请输入logcat文件名："
+            android:textColor="@color/white"
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/etSaveLog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:hint="logcat"
-            android:textSize="30sp" />
+            android:textSize="20dp" />
     </LinearLayout>
 
     <LinearLayout

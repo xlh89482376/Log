@@ -1,0 +1,48 @@
+ext {
+    time = ""
+    kotlin_version = "1.4.10"
+    android = [
+            compileSdkVersion              : 29,
+            buildToolsVersion              : "29.0.3",
+            minSdkVersion                  : 16,
+            targetSdkVersion               : 29,
+    ]
+
+    version = [
+            retrofitSdkVersion      : "2.4.0",
+            glideSdkVersion         : "4.8.0",
+            rxlifecycle2SdkVersion  : "2.2.2",
+    ]
+
+    dependencies = [
+            // arouter
+            arouter                    : "com.alibaba:arouter-api:1.5.0",
+            aroutercompiler            : "com.alibaba:arouter-compiler:1.2.2",
+
+            //network
+            "retrofit"                 : "com.squareup.retrofit2:retrofit:${version["retrofitSdkVersion"]}",
+            "retrofit-converter-gson"  : "com.squareup.retrofit2:converter-gson:${version["retrofitSdkVersion"]}",
+            "retrofit-adapter-rxjava"  : "com.squareup.retrofit2:adapter-rxjava:${version["retrofitSdkVersion"]}",
+            "retrofit-adapter-rxjava2" : "com.squareup.retrofit2:adapter-rxjava2:${version["retrofitSdkVersion"]}",
+            "okhttp3"                  : "com.squareup.okhttp3:okhttp:3.11.0",
+            "okhttp-urlconnection"     : "com.squareup.okhttp:okhttp-urlconnection:2.0.0",
+            "glide"                    : "com.github.bumptech.glide:glide:${version["glideSdkVersion"]}",
+            "glide-compiler"           : "com.github.bumptech.glide:compiler:${version["glideSdkVersion"]}",
+            "glide-loader-okhttp3"     : "com.github.bumptech.glide:okhttp3-integration:${version["glideSdkVersion"]}",
+            "picasso"                  : "com.squareup.picasso:picasso:2.5.2",
+            "glide-transformations"    : "jp.wasabeef:glide-transformations:4.1.0",
+
+            //rx2
+            "rxandroid2"               : "io.reactivex.rxjava2:rxandroid:2.1.0",
+            "rxjava2"                  : "io.reactivex.rxjava2:rxjava:2.2.3",
+            "rxlifecycle2"             : "com.trello.rxlifecycle2:rxlifecycle:${version["rxlifecycle2SdkVersion"]}",
+            "rxlifecycle2-android"     : "com.trello.rxlifecycle2:rxlifecycle-android:${version["rxlifecycle2SdkVersion"]}",
+            "rxlifecycle2-components"  : "com.trello.rxlifecycle2:rxlifecycle-components:${version["rxlifecycle2SdkVersion"]}",
+            "rxcache2"                 : "com.github.VictorAlbertos.RxCache:runtime:1.8.3-2.x",
+            "rxpermissions2"           : "com.github.tbruyelle:rxpermissions:0.10.2",
+            "rxerrorhandler2"          : "me.jessyan:rxerrorhandler:2.1.1",
+
+            // tools
+            "gson"                     : "com.google.code.gson:gson:2.8.5",
+    ]
+}

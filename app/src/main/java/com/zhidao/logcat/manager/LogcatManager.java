@@ -1,7 +1,4 @@
-package com.zhidao.logcat;
-
-import android.nfc.Tag;
-import android.util.Log;
+package com.zhidao.logcat.manager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-final class LogcatManager {
+public final class LogcatManager {
 
     /** 日志捕捉监听对象 */
     private static volatile Listener sListener;
@@ -22,7 +19,7 @@ final class LogcatManager {
     /**
      * 开始捕捉
      */
-    static void start(Listener listener) {
+    public static void start(Listener listener) {
         FLAG_WORK = true;
         new Thread(new LogRunnable()).start();
         sListener = listener;
@@ -31,7 +28,7 @@ final class LogcatManager {
     /**
      * 继续捕捉
      */
-    static void resume() {
+    public static void resume() {
         FLAG_WORK = true;
         final Listener listener = sListener;
         if (listener != null && !LOG_BACKUP.isEmpty()) {
@@ -47,14 +44,14 @@ final class LogcatManager {
     /**
      * 暂停捕捉
      */
-    static void pause() {
+    public static void pause() {
         FLAG_WORK = false;
     }
 
     /**
      * 停止捕捉
      */
-    static void destroy() {
+    public static void destroy() {
         FLAG_WORK = false;
         // 把监听对象置空，不然会导致内存泄漏
         sListener = null;
@@ -63,7 +60,7 @@ final class LogcatManager {
     /**
      * 清空日志
      */
-    static void clear() {
+    public static void clear() {
         try {
             new ProcessBuilder("logcat", "-c").start();
 //            FLAG_WORK = true;

@@ -1,2 +1,6 @@
+include ':logcore'
+include ':commonnet'
+include ':logcommon'
+include ':standOut'
 include ':app'
 rootProject.name = "Log"

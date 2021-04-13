@@ -1,9 +1,5 @@
 package com.zhidao.logcat;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.app.Application;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -25,10 +21,28 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.hjq.permissions.OnPermission;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.hjq.xtoast.XToast;
+import com.mogo.commonnet.service.LogServicePaths;
+import com.mogo.logcore.logdata.model.GetDataModel;
+import com.mogo.logcore.logdata.net.LogNetManage;
+import com.zhidao.logcat.adapter.LogcatAdapter;
+import com.zhidao.logcat.dialog.DialogSaveLog;
+import com.zhidao.logcat.manager.LogcatConfig;
+import com.zhidao.logcat.manager.LogcatInfo;
+import com.zhidao.logcat.manager.LogcatManager;
+import com.zhidao.logcat.ui.ChooseWindow;
+import com.zhidao.logcat.ui.FloatingWindow;
+import com.zhidao.logcat.utils.DialogUtils;
+import com.zhidao.logcat.utils.KeyboardUtil;
+import com.zhidao.logcat.utils.LogcatViewer;
+import com.zhidao.logcommon.utils.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -46,24 +60,29 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
+@Route(path = LogServicePaths.PATH_MAINACTIVITAY)
 public class MainActivity extends AppCompatActivity
         implements TextWatcher, View.OnLongClickListener, View.OnClickListener,
         CompoundButton.OnCheckedChangeListener, LogcatManager.Listener,
         AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener{
 
-    private final static String[] ARRAY_LOG_LEVEL = {"Verbose", "Debug", "Info", "Warn", "Error"};
+//    public static final String PATH = "/Log/MainActivity";
 
+    // log等级
+    private final static String[] ARRAY_LOG_LEVEL = {"Verbose", "Debug", "Info", "Warn", "Error"};
+    // log路径
     private final static File LOG_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "Logcat");
+    // log过滤
     private final static String LOGCAT_TAG_FILTER_FILE = "logcat_tag_filter.txt";
 
-    private List<LogcatInfo> mLogData = new ArrayList<>();
+    private final List<LogcatInfo> mLogData = new ArrayList<>();
 
     private FloatingWindow floatingWindow;
-    private boolean isFloatingWindowStart = false;
 
-    private DialogSaveLog mDialogSaveLog;
-    private String mLogName = null;
     private boolean isConfirm = false;
+
+    private boolean isLogcatViewerShowing = false;
 
     private CheckBox mSwitchView;
     private View mSaveView;
@@ -73,6 +92,8 @@ public class MainActivity extends AppCompatActivity
     private View mCleanView;
     private View mCloseView;
     private ListView mListView;
+    private View view;
+
     private View mDownView;
 
     private LogcatAdapter mAdapter;
@@ -80,14 +101,15 @@ public class MainActivity extends AppCompatActivity
     private String mLogLevel = "V";
 
     /** Tag 过滤规则 */
-    private List<String> mTagFilter = new ArrayList<>();
+    private final List<String> mTagFilter = new ArrayList<>();
 
+    private KeyboardUtil keyboardUtil;
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.logcat_window_logcat);
-
-        Log.d("MainActivity","activity: onCreate");
 
         // 设置全屏显示
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -126,6 +148,9 @@ public class MainActivity extends AppCompatActivity
         mCleanView.setOnLongClickListener(this);
         mCloseView.setOnLongClickListener(this);
 
+        // 获取Activity当前view
+        view = getWindow().getDecorView();
+
         //悬浮窗权限判断
         if (Build.VERSION.SDK_INT >= 23) {
             if (!Settings.canDrawOverlays(getApplicationContext())) {
@@ -137,11 +162,9 @@ public class MainActivity extends AppCompatActivity
         // 开始捕获
         LogcatManager.start(this);
 
-        mListView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mListView.setSelection(mAdapter.getCount() - 1);
-            }
+        mListView.postDelayed(() -> {
+            // 将第position个item显示在listView的最上面一项
+            mListView.setSelection(mAdapter.getCount() - 1);
         }, 1000);
 
         if (!LOG_DIRECTORY.isDirectory()) {
@@ -151,6 +174,12 @@ public class MainActivity extends AppCompatActivity
             LOG_DIRECTORY.mkdirs();
         }
         initFilter();
+
+        GetDataModel getDataModel = new GetDataModel();
+
+//        LogNetManage.getInstance().onTestGetRequest(getDataModel);
+
+        LogNetManage.getInstance().onTestGetRequestWith1();
     }
 
     @Override
@@ -174,50 +203,47 @@ public class MainActivity extends AppCompatActivity
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
         new ChooseWindow(this)
                 .setList("复制日志", "分享日志", "删除日志", "屏蔽日志")
-                .setListener(new ChooseWindow.OnListener() {
-                    @Override
-                    public void onSelected(final int location) {
-                        switch (location) {
-                            case 0:
-                                ClipboardManager manager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                if (manager != null) {
-                                    manager.setPrimaryClip(ClipData.newPlainText("log", mAdapter.getItem(position).getLog()));
-                                    toast("日志复制成功");
-                                } else {
-                                    toast("日志复制失败");
-                                }
-                                break;
-                            case 1:
-                                Intent intent = new Intent(Intent.ACTION_SEND);
-                                intent.setType("text/plain");
-                                intent.putExtra(Intent.EXTRA_TEXT, mAdapter.getItem(position).getLog());
-                                startActivity(Intent.createChooser(intent, "分享日志"));
-                                break;
-                            case 2:
-                                mLogData.remove(mAdapter.getItem(position));
-                                mAdapter.removeItem(position);
-                                break;
-                            case 3:
-                                XXPermissions.with(MainActivity.this)
-                                        .permission(Permission.Group.STORAGE)
-                                        .request(new OnPermission() {
-                                            @Override
-                                            public void hasPermission(List<String> granted, boolean isAll) {
-                                                addFilter(mAdapter.getItem(position).getTag());
-                                            }
+                .setListener(location -> {
+                    switch (location) {
+                        case 0:
+                            ClipboardManager manager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            if (manager != null) {
+                                manager.setPrimaryClip(ClipData.newPlainText("log", mAdapter.getItem(position).getLog()));
+                                toast("日志复制成功");
+                            } else {
+                                toast("日志复制失败");
+                            }
+                            break;
+                        case 1:
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            intent.setType("text/plain");
+                            intent.putExtra(Intent.EXTRA_TEXT, mAdapter.getItem(position).getLog());
+                            startActivity(Intent.createChooser(intent, "分享日志"));
+                            break;
+                        case 2:
+                            mLogData.remove(mAdapter.getItem(position));
+                            mAdapter.removeItem(position);
+                            break;
+                        case 3:
+                            XXPermissions.with(MainActivity.this)
+                                    .permission(Permission.Group.STORAGE)
+                                    .request(new OnPermission() {
+                                        @Override
+                                        public void hasPermission(List<String> granted, boolean isAll) {
+                                            addFilter(mAdapter.getItem(position).getTag());
+                                        }
 
-                                            @Override
-                                            public void noPermission(List<String> denied, boolean quick) {
-                                                if (quick) {
-                                                    XXPermissions.startPermissionActivity(MainActivity.this);
-                                                    toast("请授予存储权限之后再操作");
-                                                }
+                                        @Override
+                                        public void noPermission(List<String> denied, boolean quick) {
+                                            if (quick) {
+                                                XXPermissions.startPermissionActivity(MainActivity.this);
+                                                toast("请授予存储权限之后再操作");
                                             }
-                                        });
-                                break;
-                            default:
-                                break;
-                        }
+                                        }
+                                    });
+                            break;
+                        default:
+                            break;
                     }
                 })
                 .show();
@@ -243,58 +269,54 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         if (v == mSaveView) {
-//            mDialogSaveLog = new DialogSaveLog(MainActivity.this);
-//            mDialogSaveLog.setOnCommitListener((logName) -> {
-//
-//                    mLogName = logName;
-//
-//            });
+            DialogSaveLog mDialogSaveLog = new DialogSaveLog(MainActivity.this);
+            mDialogSaveLog.setOnCommitListener((logName) -> {
+
+                XXPermissions.with(this)
+                        .permission(Permission.Group.STORAGE)
+                        .request(new OnPermission() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
+                            @Override
+                            public void hasPermission(List<String> granted, boolean isAll) {
+                                writeLogCat(MainActivity.this, logName);
+                            }
+
+                            @Override
+                            public void noPermission(List<String> denied, boolean quick) {
+                                if (quick) {
+                                    XXPermissions.startPermissionActivity(MainActivity.this);
+                                    toast("请授予存储权限之后再操作");
+                                }
+                            }
+                        });
+
+            });
 
             if (!mDialogSaveLog.isShowing()) {
                 mDialogSaveLog.show();
             }
-
-            XXPermissions.with(this)
-                    .permission(Permission.Group.STORAGE)
-                    .request(new OnPermission() {
-                        @Override
-                        public void hasPermission(List<String> granted, boolean isAll) {
-                            saveLogToFile(mLogName);
-                        }
-
-                        @Override
-                        public void noPermission(List<String> denied, boolean quick) {
-                            if (quick) {
-                                XXPermissions.startPermissionActivity(MainActivity.this);
-                                toast("请授予存储权限之后再操作");
-                            }
-                        }
-                    });
         } else if (v == mLevelView) {
             new ChooseWindow(this)
                     .setList(ARRAY_LOG_LEVEL)
-                    .setListener(new ChooseWindow.OnListener() {
-                        @Override
-                        public void onSelected(int position) {
-                            switch (position) {
-                                case 0:
-                                    setLogLevel("V");
-                                    break;
-                                case 1:
-                                    setLogLevel("D");
-                                    break;
-                                case 2:
-                                    setLogLevel("I");
-                                    break;
-                                case 3:
-                                    setLogLevel("W");
-                                    break;
-                                case 4:
-                                    setLogLevel("E");
-                                    break;
-                                default:
-                                    break;
-                            }
+                    .setListener(position -> {
+                        switch (position) {
+                            case 0:
+                                setLogLevel("V");
+                                break;
+                            case 1:
+                                setLogLevel("D");
+                                break;
+                            case 2:
+                                setLogLevel("I");
+                                break;
+                            case 3:
+                                setLogLevel("W");
+                                break;
+                            case 4:
+                                setLogLevel("E");
+                                break;
+                            default:
+                                break;
                         }
                     })
                     .show();
@@ -317,6 +339,7 @@ public class MainActivity extends AppCompatActivity
             toast("日志捕捉已暂停");
             LogcatManager.pause();
         } else {
+            toast("日志捕捉已开启");
             LogcatManager.resume();
         }
     }
@@ -335,13 +358,14 @@ public class MainActivity extends AppCompatActivity
         mAdapter.clearData();
         for (LogcatInfo info : mLogData) {
             if ("V".equals(mLogLevel) || info.getLevel().equals(mLogLevel)) {
-                if (!"".equals(keyword)) {
-                    if (info.getLog().contains(keyword) || info.getTag().contains(keyword)) {
-                        mAdapter.addItem(info);
-                    }
-                } else {
-                    mAdapter.addItem(info);
-                }
+//                if (!"".equals(keyword)) {
+//                    if (info.getLog().contains(keyword) || info.getTag().contains(keyword)) {
+//                        mAdapter.addItem(info);
+//                    }
+//                } else {
+//                    mAdapter.addItem(info);
+                mAdapter.addItem(info);
+//                }
             }
         }
         mListView.setSelection(mAdapter.getCount() - 1);
@@ -377,7 +401,7 @@ public class MainActivity extends AppCompatActivity
 
     private class LogRunnable implements Runnable {
 
-        private LogcatInfo info;
+        private final LogcatInfo info;
 
         private LogRunnable(LogcatInfo info) {
             this.info = info;
@@ -414,25 +438,18 @@ public class MainActivity extends AppCompatActivity
     /**
      * 初始化 Tag 过滤器
      */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initFilter() {
         File file = new File(LOG_DIRECTORY, LOGCAT_TAG_FILTER_FILE);
         if (file.exists() && file.isFile() && XXPermissions.hasPermission(this, Permission.Group.STORAGE)) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ? StandardCharsets.UTF_8 : Charset.forName("UTF-8")));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ? StandardCharsets.UTF_8 : StandardCharsets.UTF_8))) {
                 String tag;
                 while ((tag = reader.readLine()) != null) {
                     mTagFilter.add(tag);
                 }
             } catch (IOException e) {
                 toast("读取屏蔽配置失败");
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ignored) {}
-                }
             }
         }
     }
@@ -525,6 +542,72 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void writeLogCat(Context context, String logcatName) {
+        BufferedWriter writer = null;
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d -v time");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder log = new StringBuilder();
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                log.append(line);
+                log.append("\n");
+            }
+//            new ProcessBuilder().command("logcat", "-c").redirectErrorStream(true).start();
+            File file = logFile(context, logcatName);
+            if (!file.isFile()) {
+                file.delete();
+            }
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, false), Charset.forName("UTF-8")));
+            writer.write(log.toString().replace("\n", "\r\n") + "\r\n\r\n");
+            writer.flush();
+            toast("保存成功：" + file.getPath());
+        } catch (IOException e) {
+//            e.printStackTrace();
+            toast("保存失败");
+        } catch (OutOfMemoryError e) {
+//            e.printStackTrace();
+            toast("保存失败");
+        } catch (Exception e) {
+//            e.printStackTrace();
+            toast("保存失败");
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ignored) {}
+            }
+        }
+    }
+
+    private static File logFileDir(Context context) {
+        File sdCard = Environment.getExternalStorageDirectory();
+        File dir = new File(sdCard.getAbsolutePath() + File.separator + "Meow"
+                + File.separator + context.getApplicationContext().getPackageName());
+        if (!dir.isDirectory()) {
+            dir.delete();
+        }
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        if (!dir.exists()) {
+            boolean mkdirs = dir.mkdirs();
+        }
+        return dir;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static File logFile(Context context, String logcatName) {
+        File dir = logFileDir(context);
+        return new File(dir, new SimpleDateFormat("yyyyMMdd_kkmmss", Locale.getDefault()).format(new Date()) + logcatName + ".txt");
+    }
+
     /**
      * 吐司提示
      */
@@ -546,15 +629,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-        Log.d("MainActivity","activity: onStart");
+//        Log.d("MainActivity","activity: onStart");
+        Logger.d("MainActivity", "onStart");
+        if (isLogcatViewerShowing) {
+            LogcatViewer.closeLogcatLoggerView(MainActivity.this);
+        }
         super.onStart();
     }
 
     @Override
     protected void onResume() {
         Log.d("MainActivity","activity: onResume");
-        LogcatManager.resume();
+//        LogcatManager.resume();
 
+        boolean isFloatingWindowStart = false;
         if (isFloatingWindowStart) {
             Log.d("MainActivity", "floatWindow:" + floatingWindow);
             floatingWindow.cancel();
@@ -566,17 +654,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         Log.d("MainActivity","activity: onPause");
-        LogcatManager.pause();
+//        LogcatManager.pause();
 //        LogcatManager.resume();
-        floatingWindow = new FloatingWindow(getApplication());
-        floatingWindow.show();
-        isFloatingWindowStart = true;
+//        floatingWindow = new FloatingWindow(getApplication());
+//        floatingWindow.show();
+//        isFloatingWindowStart = true;
+        LogcatViewer.showLogcatLoggerView(MainActivity.this);
+        isLogcatViewerShowing = true;
+        KeyboardUtil.hideKeyboard(view);
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-
         Log.d("MainActivity","activity: onStop");
         super.onStop();
     }

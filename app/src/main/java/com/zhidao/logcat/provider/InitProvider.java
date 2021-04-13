@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.provider;
 
 import android.app.Application;
 import android.content.ContentProvider;
@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.zhidao.logcat.manager.LogcatConfig;
+import com.zhidao.logcat.ui.FloatingLifecycle;
 
 public final class InitProvider extends ContentProvider {
 

@@ -1,4 +1,4 @@
-package com.zhidao.logcat.ui.dialog;
+package com.zhidao.logcat.dialog;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;

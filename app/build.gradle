@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     lintOptions {
@@ -6,36 +9,66 @@ android {
         abortOnError false
     }
 
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
 
     defaultConfig {
         applicationId "com.zhidao.logcat"
-        minSdkVersion 14
-        targetSdkVersion 29
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+
+    // gradle生成签名apk
+    signingConfigs {
+        config {
+            storeFile file(KEY_PATH)
+            storePassword KEY_PASS
+            keyAlias ALIAS_NAME
+            keyPassword ALIAS_PASS
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // gradle生成签名apk
+            signingConfig signingConfigs.config
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    flavorDimensions "env"
+    productFlavors {
+        qa {
+            dimension "env"
+            buildConfigField 'int', 'NET_ENV', '2'
+        }
+        online {
+            dimension "env"
+            buildConfigField 'int', 'NET_ENV', '3'
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    testImplementation 'junit:junit:4.13'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation project(path: ':commonnet')
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
@@ -43,5 +76,18 @@ dependencies {
     implementation 'com.hjq:xxpermissions:6.5'
     // 悬浮窗框架：https://github.com/getActivity/XToast
     implementation 'com.hjq:xtoast:5.5'
+    // EasyFloat悬浮窗框架 https://github.com/princekin-f/EasyFloat
+//    implementation 'com.github.princekin-f:EasyFloat:1.3.4'
+
+    // logviewer
+//    implementation 'com.github.weijiaxing:LogcatViewer:1.0.3'
+
+//    implementation 'com.github.fatangare.LogcatViewer:logcatviewer:aadf092447'
+    implementation project(':standOut')
+    implementation project(':logcommon')
+    implementation project(':logcore')
+
+    implementation rootProject.ext.dependencies.arouter
+    kapt rootProject.ext.dependencies.aroutercompiler
 
 }

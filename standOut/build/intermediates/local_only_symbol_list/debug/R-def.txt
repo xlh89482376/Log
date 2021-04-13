@@ -1,0 +1,24 @@
+R_DEF: Internal format may change without notice
+local
+drawable background
+drawable close
+drawable corner
+drawable hide
+drawable logcat_ic_close
+drawable maximize
+id body
+id close
+id content
+id corner
+id description
+id icon
+id title
+id titlebar
+id window_icon
+layout drop_down_list_item
+layout system_window_decorators
+string close
+string corner
+string hide
+string maximize
+string window_icon

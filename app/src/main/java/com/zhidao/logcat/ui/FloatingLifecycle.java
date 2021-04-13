@@ -1,14 +1,16 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.ui;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-final class FloatingLifecycle implements Application.ActivityLifecycleCallbacks {
+import com.zhidao.logcat.MainActivity;
+
+public final class FloatingLifecycle implements Application.ActivityLifecycleCallbacks {
 
     Application application;
 
-    static void with(Application application) {
+    public static void with(Application application) {
         application.registerActivityLifecycleCallbacks(new FloatingLifecycle());
     }
 

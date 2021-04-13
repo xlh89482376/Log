@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.utils;
 
 import android.app.Activity;
 import android.content.DialogInterface;

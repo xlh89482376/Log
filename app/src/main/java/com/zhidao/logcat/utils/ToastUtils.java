@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.utils;
 
 import android.content.Context;
 import android.view.Gravity;

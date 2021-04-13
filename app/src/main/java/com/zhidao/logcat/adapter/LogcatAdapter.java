@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.adapter;
 
 import android.graphics.Color;
 import android.os.Build;
@@ -14,10 +14,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zhidao.logcat.manager.LogcatInfo;
+import com.zhidao.logcat.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-final class LogcatAdapter extends BaseAdapter {
+public final class LogcatAdapter extends BaseAdapter {
 
     private static final int MAX_LINE = 4;
     private final SparseBooleanArray mExpandSet = new SparseBooleanArray();
@@ -54,14 +57,14 @@ final class LogcatAdapter extends BaseAdapter {
         return mDataSet.get(position);
     }
 
-    List<LogcatInfo> getData() {
+    public List<LogcatInfo> getData() {
         return mDataSet;
     }
 
     /**
      * 添加单条数据
      */
-    void addItem(LogcatInfo item) {
+    public void addItem(LogcatInfo item) {
         mDataSet.add(item);
         notifyDataSetChanged();
     }
@@ -69,7 +72,7 @@ final class LogcatAdapter extends BaseAdapter {
     /**
      * 删除某条数据
      */
-    void removeItem(int position) {
+    public void removeItem(int position) {
         mDataSet.remove(position);
         notifyDataSetChanged();
     }
@@ -82,19 +85,19 @@ final class LogcatAdapter extends BaseAdapter {
     /**
      * 清空当前数据
      */
-    void clearData() {
+    public void clearData() {
         mExpandSet.clear();
         mDataSet.clear();
         notifyDataSetChanged();
     }
 
-    void onItemClick(int position) {
+    public void onItemClick(int position) {
         boolean expand = mExpandSet.get(position);
         mExpandSet.put(position, !expand);
         notifyDataSetChanged();
     }
 
-    void setKeyword(String keyword) {
+    public void setKeyword(String keyword) {
         mKeyword = keyword;
     }
 

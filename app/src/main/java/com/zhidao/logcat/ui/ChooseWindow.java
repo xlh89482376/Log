@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.ui;
 
 import android.app.Activity;
 import android.view.Gravity;
@@ -9,17 +9,18 @@ import android.widget.ListView;
 
 import com.hjq.xtoast.OnClickListener;
 import com.hjq.xtoast.XToast;
+import com.zhidao.logcat.R;
 import com.zhidao.logcat.adapter.ChooseAdapter;
 
 import java.util.Arrays;
 import java.util.List;
 
-final class ChooseWindow extends XToast implements AdapterView.OnItemClickListener, OnClickListener {
+public final class ChooseWindow extends XToast implements AdapterView.OnItemClickListener, OnClickListener {
 
     private final ChooseAdapter mAdapter;
     private OnListener mListener;
 
-    ChooseWindow(Activity activity) {
+    public ChooseWindow(Activity activity) {
         super(activity);
         setView(R.layout.logcat_window_choose);
         setGravity(Gravity.CENTER);
@@ -38,7 +39,7 @@ final class ChooseWindow extends XToast implements AdapterView.OnItemClickListen
         cancel();
     }
 
-    ChooseWindow setList(String... data) {
+    public ChooseWindow setList(String... data) {
         return setList(Arrays.asList(data));
     }
 
@@ -47,7 +48,7 @@ final class ChooseWindow extends XToast implements AdapterView.OnItemClickListen
         return this;
     }
 
-    ChooseWindow setListener(OnListener listener) {
+    public ChooseWindow setListener(OnListener listener) {
         mListener = listener;
         return this;
     }

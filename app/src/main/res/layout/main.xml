@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    >
+    <!-- Logcat log view -->
+    <ListView
+		android:id="@+id/list"
+	    android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/menuOptionsLayout"
+        android:background="#2b2b2b"
+        android:scrollbarThumbVertical="@color/logcat_scrollbar_thumb_color"
+		android:dividerHeight="1dp"
+        android:scrollbarSize="1dp"
+        android:fastScrollEnabled="true"
+        android:fastScrollAlwaysVisible="true"/>
+
+    <!-- Menu option specific views -->
+    <LinearLayout
+        android:id="@+id/menuOptionsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottombar"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:padding="4dp">
+
+        <!-- 'Saved logs' view -->
+        <ListView
+            android:id="@+id/recordList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/holo_green_dark"
+            android:dividerHeight="0.5dp"
+            android:visibility="gone" />
+
+        <!-- 'Set Filter' view -->
+        <LinearLayout
+            android:id="@+id/filterLayout"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight=".3"
+                android:text="@string/logfilter_lable"
+                android:paddingLeft="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@android:color/black"
+                android:background="@android:color/holo_green_dark"/>
+            <EditText
+                android:id="@+id/etLogFilter"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight=".4"
+                android:textSize="20sp"
+                android:textColor="@android:color/holo_green_dark"
+                android:focusable="true"
+                android:maxLines="1"
+                />
+            <Button
+                android:id="@+id/btnLogFilter"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="@string/logfilter_button"
+                android:layout_weight=".3"
+                android:background="@android:color/holo_green_dark"
+                android:textColor="@android:color/black"/>
+            </LinearLayout>
+
+        <!-- Priority Levels view -->
+        <RadioGroup
+            android:id="@+id/rgPriorityLevels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <RadioButton android:id="@+id/radioVerbose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/priority_verbose"
+                android:textColor="@android:color/holo_green_dark"
+                android:padding="3dp"
+                android:checked="true" />
+            <RadioButton android:id="@+id/radioDebug"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/priority_debug"
+                android:textColor="@android:color/holo_green_dark"
+                android:padding="3dp"/>
+            <RadioButton android:id="@+id/radioInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/priority_info"
+                android:textColor="@android:color/holo_green_dark"
+                android:padding="3dp"/>
+            <RadioButton android:id="@+id/radioWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/priority_warning"
+                android:textColor="@android:color/holo_green_dark"
+                android:padding="3dp"/>
+            <RadioButton android:id="@+id/radioError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/priority_error"
+                android:textColor="@android:color/holo_green_dark"
+                android:padding="3dp"/>
+        </RadioGroup>
+    </LinearLayout>
+    <!-- Bottom bar -->
+    <RelativeLayout
+        android:id="@+id/bottombar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:background="#FF3C3F41"
+        android:layout_alignParentBottom="true">
+
+        <!-- Bottom bar for standard view -->
+        <LinearLayout
+            android:id="@+id/normalbottombar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/pause"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/pause"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/play"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/play"
+                android:visibility="gone"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/record"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/record"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/recordOn"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/recordon"
+                android:visibility="gone"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/btnRecordList"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/recordlist"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/find"
+                android:layout_width="16dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/find" />
+
+            <ImageView
+                android:id="@+id/btnPriorityLevel"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/prioritylevels"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/btnReset"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/reset"
+                android:layout_marginEnd="10dp" />
+        </LinearLayout>
+        <!-- Bottom bar for 'saved logs' view -->
+        <LinearLayout
+            android:id="@+id/recordsbottombar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/back" />
+
+            <ImageView
+                android:id="@+id/btnSelectAll"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/selectall"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/btnDelete"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/delete"
+                android:layout_marginEnd="10dp" />
+
+            <ImageView
+                android:id="@+id/btnShare"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/share"
+                android:layout_marginEnd="10dp" />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

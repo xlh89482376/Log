@@ -1,0 +1,13 @@
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lv_log_list1"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
+    android:background="#2b2b2b"
+    android:dividerHeight="0px"
+    android:fadeScrollbars="true"
+    android:scrollbarSize="1dp"
+    android:scrollbarThumbVertical="@color/logcat_scrollbar_thumb_color"
+    android:scrollbars="vertical"
+    android:verticalScrollbarPosition="left"
+    tools:listitem="@layout/logcat_item_logcat" />

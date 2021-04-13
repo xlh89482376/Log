@@ -1,4 +1,4 @@
-package com.zhidao.logcat;
+package com.zhidao.logcat.manager;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -54,11 +54,11 @@ public final class LogcatInfo {
         return level;
     }
 
-    String getTag() {
+    public String getTag() {
         return tag;
     }
 
-    String getLog() {
+    public String getLog() {
         return log;
     }
 
@@ -66,7 +66,7 @@ public final class LogcatInfo {
         return pid;
     }
 
-    void addLog(String text) {
+    public void addLog(String text) {
         log = (log.startsWith(LINE_SPACE) ? "" : LINE_SPACE) + log + LINE_SPACE + text;
     }
 
